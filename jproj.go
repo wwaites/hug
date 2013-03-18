@@ -179,14 +179,14 @@ func JsonProj(w http.ResponseWriter, req *http.Request) {
 		xr, err = parseForm(req)
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		webx.JsonError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer xr.Free()
 
 	result, err := cproj.Transform(xr.from_pj, xr.to_pj, xr.coords)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		webx.JsonError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

@@ -15,6 +15,18 @@ func JsonResponse(w http.ResponseWriter, r interface{}) {
 	return
 }
 
+func JsonError(w http.ResponseWriter, message string, status int) {
+	w.Header().Set("Content-Type", "text/javascript")
+	msg := make(map[string]string)
+	msg["error"] = message
+	b, err := json.Marshal(msg)
+	if err == nil {
+		w.WriteHeader(status)
+		w.Write(b)
+	}
+	return
+}
+
 type StatusResponse struct {
 	http.ResponseWriter
 	Status int
