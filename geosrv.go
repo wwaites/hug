@@ -4,6 +4,7 @@ import (
 	"flag"
 	"jproj"
 	"log"
+	"log/syslog"
 	"net/http"
 	"os"
 	"webx"
@@ -14,14 +15,21 @@ var logfile string
 
 func init() {
 	flag.StringVar(&htdocs, "htdocs", "./htdocs", "Location of static content")
-	flag.StringVar(&logfile, "log", "", "Location for log file")
+	flag.StringVar(&logfile, "log", "", "Location for log file, or the string \"syslog\"")
 }
 
 func main() {
 	flag.Parse()
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	log.SetOutput(os.Stderr)
-	if logfile != "" {
+	if logfile == "syslog" {
+		logger, err := syslog.New(syslog.LOG_INFO, "geosrv")
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.SetOutput(logger)
+		log.SetFlags(log.Lshortfile)
+	} else if logfile != "" {
 		fp, err := os.OpenFile(logfile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Fatal(err)

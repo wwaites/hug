@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"math"
 )
 
@@ -52,7 +51,6 @@ func Transform(from_pj, to_pj *Proj, coord []float64) (result []float64, err err
 		for i, v := range inplace {
 			inplace[i] = v * math.Pi / 180
 		}
-		log.Print("source radians: ", inplace)
 	}
 
 	var ret int
@@ -67,7 +65,6 @@ func Transform(from_pj, to_pj *Proj, coord []float64) (result []float64, err err
 		err = errors.New("Transformation failed")
 	} else {
 		if to_pj.IsLatLong() {
-			log.Print("result radians: ", inplace)
 			for i, v := range inplace {
 				inplace[i] = v * 180 / math.Pi
 			}
