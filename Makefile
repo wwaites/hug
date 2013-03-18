@@ -4,7 +4,7 @@ OBJS   =\
 	hutil.o \
 	cproj.o \
 	jproj.o \
-	server.o
+	geosrv.o
 PROG=geosrv
 
 all: ${PROG}
