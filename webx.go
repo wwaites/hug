@@ -21,9 +21,6 @@ type StatusResponse struct {
 	Bytes  int
 }
 func (sr *StatusResponse) Write(buf []byte) (bytes int, err error) {
-	if sr.Status == 0 {
-		sr.Status = 200
-	}
 	bytes, err = sr.ResponseWriter.Write(buf)
 	sr.Bytes += bytes
 	return
@@ -37,7 +34,7 @@ type LogHandler struct {
 	http.Handler
 }
 func (lh LogHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	sr := &StatusResponse{w, 0, 0}
+	sr := &StatusResponse{w, 200, 0}
 	lh.Handler.ServeHTTP(sr, r)
 	log.Printf("%d %d %s %s %s %s", sr.Status, sr.Bytes,
 		r.RemoteAddr, r.Host, r.Method, r.RequestURI)
