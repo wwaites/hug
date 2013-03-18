@@ -1,6 +1,6 @@
-GCCGO=gccgo
-CFLAGS=-O3 -g -fPIC -Wall -Werror
-OBJS=\
+GCCGO  ?=gccgo
+CFLAGS ?=-O3 -g -Wall -Werror
+OBJS   =\
 	hutil.o \
 	cproj.o \
 	jproj.o \
