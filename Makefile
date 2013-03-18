@@ -1,10 +1,10 @@
 GCCGO  ?=gccgo
 CFLAGS ?=-O3 -g -Wall -Werror
 OBJS   =\
-	hutil.o \
+	webx.o \
 	cproj.o \
 	jproj.o \
-	geosrv.o
+	geosrv.o 
 PROG=geosrv
 
 all: ${PROG}

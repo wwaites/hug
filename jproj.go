@@ -6,10 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hutil"
-//	"log"
 	"net/http"
 	"strconv"
+	"webx"
 )
 
 type xformReq struct {
@@ -198,5 +197,5 @@ func JsonProj(w http.ResponseWriter, req *http.Request) {
 		r["z"] = result[2]
 	}
 
-	hutil.JsonResponse(w, r)
+	webx.JsonResponse(w, r)
 }

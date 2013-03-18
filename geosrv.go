@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"hutil"
 	"jproj"
 	"log"
 	"net/http"
 	"os"
+	"webx"
 )
 
 var htdocs string
@@ -31,7 +31,7 @@ func main() {
 		defer fp.Close()
 	}
 	log.Printf("%s starting (pid: %d)", os.Args[0], os.Getpid())
-	http.Handle("/api/proj/", hutil.LogHandlerFunc(jproj.JsonProj))
-	http.Handle("/", hutil.NewLogHandler(http.FileServer(http.Dir(htdocs))))
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	http.HandleFunc("/api/proj/", jproj.JsonProj)
+	http.Handle("/", http.FileServer(http.Dir(htdocs)))
+	log.Fatal(http.ListenAndServe(":8080", webx.LogHandler{http.DefaultServeMux}))
 }
