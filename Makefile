@@ -4,6 +4,8 @@ OBJS   =\
 	webx.o \
 	cproj.o \
 	jproj.o \
+	vect.o \
+	geo.o \
 	geosrv.o 
 PROG=geosrv
 
@@ -18,3 +20,13 @@ clean:
 
 ${PROG}: ${OBJS}
 	${GCCGO} -o $@ $^ -lgo -lproj
+
+gt: gt.o vect.o geo.o
+	${GCCGO} -o $@ $^ -lgo
+	./gt > nn.dat
+	gnuplot nn.plt
+
+fr: vect.o geo.o fresnel.o fr.o
+	${GCCGO} -o $@ $^ -lgo
+	./fr > fr.dat
+	gnuplot fr.plt
