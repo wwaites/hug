@@ -48,11 +48,13 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
 	// transform to cartesian coordinates
 	x1 := Cartesian(p1, r)
 	x2 := Cartesian(p2, r)
-	
+
+	// find the step size
 	d := x2.Sub(x1)
 	step := d.Mul(1 / float64(n))
 	stepsize := step.Length()
 
+	// implementation detail -- this is just AdjustAlt with altitude set to zero!
 	pts := make(chan vect.Vector)
 	go func() {
 		for i := 0 ; i <= n; i++ {
@@ -60,25 +62,13 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
 		}
 		close(pts)
 	}()
-
+	
 	return AdjustAlt(p1, p2, pts, r)
-
-	/*
-	curve := make([]vect.Vector, 0, n + 1)
-	curve = append(curve, vect.Vector{0,0})
-
-	// Starting at x1, incrementally move towards x2
-	// recording the difference between r and x, i.e. the distance from
-	// the chord to the circle
-	for i, x := 1, x1; i < n+1; i++ {
-		x = x.Add(step)
-		pt := vect.Vector{float64(i) * stepsize, r - x.Length()}
-		curve = append(curve, pt)
-	}
-	return curve
-	 */
 }
 
+// Given two points, as with ChordHeight, and a sequence of data points representing 
+// the terrain height between those two points, adjust the data to correct for the curvature
+// of the earth.
 func AdjustAlt(p1, p2 LonLat, pts chan vect.Vector, r float64) (ch chan vect.Vector) {
 	ch = make(chan vect.Vector)
 
