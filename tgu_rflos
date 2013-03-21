@@ -1,0 +1,54 @@
+#!/bin/sh
+
+pt1="$1"
+pt2="$2"
+outfile="$3"
+
+srid=27700
+freq=5.5e9
+
+usage() {
+	echo "Usage: $0 x1,y1,z1 x2,y2,z2 outfile.png"
+}
+
+if test -z "$pt1" -o -z "$pt2" -o -z "$outfile"; then
+	usage
+	exit 255
+fi
+
+eval `g.region -g` || exit 255
+
+h1=`echo $pt1 | sed 's/^.*,\([^,]*\)$/\1/'`
+x1=`echo $pt1 | sed 's/^\(.*\),[^,]*$/\1/'`
+h2=`echo $pt2 | sed 's/^.*,\([^,]*\)$/\1/'`
+x2=`echo $pt2 | sed 's/^\(.*\),[^,]*$/\1/'`
+
+if test -z "${TMPDIR}"; then TMPDIR=/tmp; fi
+#workdir=${TMPDIR}/rflos.$$
+workdir=x
+mkdir $workdir
+
+r.profile input=profile_dtm profile=${x1},${x2} > ${workdir}/profile.dat || exit 255
+alt1=`head -1 ${workdir}/profile.dat | cut -d' ' -f2`
+alt2=`tail -1 ${workdir}/profile.dat | cut -d' ' -f2`
+
+absh1=`echo ${h1} + ${alt1} | bc`
+absh2=`echo ${h2} + ${alt2} | bc`
+
+tgu_fresnel -srid="${srid}" -freq="${freq}" -s="${nsres}" \
+	"${x1},${absh1}" "${x2},${absh2}" > ${workdir}/fresnel.dat || exit 255
+
+tgu_curve -srid="${srid}" "${x1}" "${x2}" ${workdir}/profile.dat > ${workdir}/adjusted.dat || exit 255
+
+cat > ${workdir}/diagram.plt <<EOF
+set terminal png size 1000,400
+set output "${outfile}"
+set xlabel "Distance (m)"
+set ylabel "Height (m)"
+plot "${workdir}/fresnel.dat" using 1:2 notitle with dots, \
+     "${workdir}/adjusted.dat" using 1:2 notitle with lines
+EOF
+
+gnuplot ${workdir}/diagram.plt || exit 255
+
+# rm -rf ${workdir}

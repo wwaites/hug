@@ -4,6 +4,7 @@ INSTALL ?=/usr/bin/install
 PREFIX  ?=/usr/local
 DAEMON  =tgud
 UTILS   =tgu_convert tgu_fresnel tgu_circle tgu_addseq tgu_curve
+SCRIPTS =tgu_rflos
 
 all: ${DAEMON} ${UTILS}
 
@@ -13,6 +14,9 @@ clean:
 
 install: all
 	for prog in ${UTILS}; do \
+		${INSTALL} -c -m 755 $$prog ${PREFIX}/bin/$$prog; \
+	done
+	for prog in ${SCRIPTS}; do \
 		${INSTALL} -c -m 755 $$prog ${PREFIX}/bin/$$prog; \
 	done
 	${INSTALL} -c -m 755 ${DAEMON} ${PREFIX}/sbin/${DAEMON}
