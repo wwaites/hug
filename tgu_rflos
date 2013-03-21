@@ -24,8 +24,7 @@ h2=`echo $pt2 | sed 's/^.*,\([^,]*\)$/\1/'`
 x2=`echo $pt2 | sed 's/^\(.*\),[^,]*$/\1/'`
 
 if test -z "${TMPDIR}"; then TMPDIR=/tmp; fi
-#workdir=${TMPDIR}/rflos.$$
-workdir=x
+workdir=${TMPDIR}/rflos.$$
 mkdir $workdir
 
 r.profile input=profile_dtm profile=${x1},${x2} > ${workdir}/profile.dat || exit 255
@@ -51,4 +50,4 @@ EOF
 
 gnuplot ${workdir}/diagram.plt || exit 255
 
-# rm -rf ${workdir}
+rm -rf ${workdir}
