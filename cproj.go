@@ -7,20 +7,21 @@ import (
 	"math"
 )
 
-func pj_init_plus(*byte) int __asm__("pj_init_plus")
-func pj_free(int) __asm__("pj_free")
-func pj_transform(int, int, int, int, *float64, *float64, *float64) int __asm__("pj_transform")
-func pj_is_latlong(int) int __asm__("pj_is_latlong")
+type ptr *int
+func pj_init_plus(*byte) ptr __asm__("pj_init_plus")
+func pj_free(ptr) __asm__("pj_free")
+func pj_transform(ptr, ptr, int, int, *float64, *float64, *float64) int __asm__("pj_transform")
+func pj_is_latlong(ptr) int __asm__("pj_is_latlong")
 
 type Proj struct {
-	pj int
+	pj ptr
 }
 
 func InitPlus(spec string) (proj *Proj, err error) {
 	buf := bytes.NewBufferString(spec)
 	buf.WriteByte(0)
 	p := pj_init_plus(&(buf.Bytes()[0]))
-	if p == 0 {
+	if p == nil {
 		err = errors.New(fmt.Sprintf("Invalid spec: %s", spec))
 	} else {
 		proj = &Proj{p}
