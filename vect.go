@@ -3,6 +3,7 @@ package vect
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -45,6 +46,15 @@ func (v1 Vector) Dot(v2 Vector) float64 {
 	return product
 }
 
+// Vector product XXX only for 3 dimensional vectors!
+func (a Vector) Cross(b Vector) Vector {
+	c := make(Vector, 3)
+	c[0] = a[1] * b[2] - a[2] * b[1]
+	c[1] = a[2] * b[0] - a[0] * b[2]
+	c[2] = a[0] * b[1] - a[1] * b[0]
+	return c
+}
+
 // The length of the vector
 func (v Vector) Length() float64 {
 	return math.Sqrt(v.Dot(v))
@@ -62,4 +72,50 @@ func (v Vector) String() string {
 		s = append(s, fmt.Sprintf("%.06f", v))
 	}
 	return "[" + strings.Join(s, ", ") + "]"
+}
+
+func ParseCoord(coord string) (v Vector, err error) {
+	xs := strings.Split(coord, ",")
+	v = make(Vector, 0, len(xs))
+	for _, s := range xs {
+		x, e := strconv.ParseFloat(s, 64)
+		if e != nil {
+			err = e
+			break
+		}
+		v = append(v, x)
+	}
+	return
+}
+
+type Matrix []Vector
+func (m Matrix) Transpose() (r Matrix) {
+	r = make(Matrix, len(m[0]))
+	for i := 0; i < len(m[0]); i++ {
+		r[i] = make(Vector, len(m))
+		for j := 0; j < len(r[i]); j++ {
+			r[i][j] = m[j][i]
+		}
+	}
+	return r
+}
+
+func (m1 Matrix) Mul(m2 Matrix) (r Matrix) {
+	m2t := m2.Transpose()
+	r = make(Matrix, len(m2))
+	for i := 0; i < len(m1); i++ {
+		r[i] = make(Vector, len(m2t))
+		for j := 0; j < len(m2t); j++ {
+			r[i][j] = m1[i].Dot(m2t[j])
+		}
+	}
+	return r
+}
+
+func (m Matrix) String() string {
+	vs := make([]string, 0, len(m))
+	for _, v := range m {
+		vs = append(vs, v.String())
+	}
+	return "[" + strings.Join(vs, ", ")  + "]"
 }

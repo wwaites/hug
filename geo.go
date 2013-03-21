@@ -44,7 +44,7 @@ func Cartesian(p LonLat, r float64) vect.Vector {
 // The return value is a list of (d,h) pairs where d is the distance along the chord starting
 // at p1 and h is the difference between r and the distance from the centre of the sphere
 // to that point.
-func ChordHeight(p1, p2 LonLat, r float64, n int) []vect.Vector {
+func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
 	// transform to cartesian coordinates
 	x1 := Cartesian(p1, r)
 	x2 := Cartesian(p2, r)
@@ -53,6 +53,17 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) []vect.Vector {
 	step := d.Mul(1 / float64(n))
 	stepsize := step.Length()
 
+	pts := make(chan vect.Vector)
+	go func() {
+		for i := 0 ; i <= n; i++ {
+			pts <- vect.Vector{float64(i) * stepsize, 0}
+		}
+		close(pts)
+	}()
+
+	return AdjustAlt(p1, p2, pts, r)
+
+	/*
 	curve := make([]vect.Vector, 0, n + 1)
 	curve = append(curve, vect.Vector{0,0})
 
@@ -65,4 +76,36 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) []vect.Vector {
 		curve = append(curve, pt)
 	}
 	return curve
+	 */
+}
+
+func AdjustAlt(p1, p2 LonLat, pts chan vect.Vector, r float64) (ch chan vect.Vector) {
+	ch = make(chan vect.Vector)
+
+	go func () {
+		// transform to cartesian coordinates
+		x1 := Cartesian(p1, r)
+		x2 := Cartesian(p2, r)
+	
+		// unit vector in the direction between the two points
+		ud := x2.Sub(x1).Norm()
+		// unit vector in the vertical direction
+		uh := ud.Cross(x1).Cross(ud).Norm()
+
+		for pt := range pts {
+			x := x1.Add(ud.Mul(pt[0]))
+			h := x.Norm().Mul(pt[1] + r)
+			v := vect.Vector{
+				// component in the direction of the line
+				h.Dot(ud) - x1.Dot(ud),
+				// component perpendicular to the line
+				h.Dot(uh) - x.Dot(uh),
+			}
+			ch <- v
+		}
+
+		close(ch)
+	}()
+
+	return ch
 }
