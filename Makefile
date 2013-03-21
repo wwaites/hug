@@ -1,25 +1,26 @@
-GCCGO  ?=gccgo
-CFLAGS ?=-O3 -g -Wall -Werror
-OBJS   =\
-	webx.o \
-	cproj.o \
-	jproj.o \
-	vect.o \
-	geo.o \
-	geosrv.o 
-PROG=geosrv
-UTILS=tgu_convert tgu_fresnel tgu_circle tgu_addseq tgu_curve
+GCCGO   ?=gccgo
+CFLAGS  ?=-O3 -g -Wall -Werror
+INSTALL ?=/usr/bin/install
+PREFIX  ?=/usr/local
+DAEMON  =tgud
+UTILS   =tgu_convert tgu_fresnel tgu_circle tgu_addseq tgu_curve
 
-all: ${PROG} ${UTILS}
+all: ${DAEMON} ${UTILS}
 
 clean:
 	rm -f *.o *~
-	rm -f ${PROG} ${UTILS}
+	rm -f ${DAEMON} ${UTILS}
+
+install: all
+	for prog in ${UTILS}; do \
+		${INSTALL} -c -m 755 $$prog ${PREFIX}/bin/$$prog; \
+	done
+	${INSTALL} -c -m 755 ${DAEMON} ${PREFIX}/sbin/${DAEMON}
 
 %.o: %.go
 	${GCCGO} ${CFLAGS} -c -o $@ $<
 
-${PROG}: ${OBJS}
+tgud: webx.o cproj.o jproj.o vect.o geo.o geosrv.o
 	${GCCGO} -o $@ $^ -lgo -lproj
 
 tgu_convert: vect.o cproj.o tgu_convert.o
