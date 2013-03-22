@@ -10,6 +10,29 @@ import (
 // A Vector of floating point numbers
 type Vector []float64
 
+// Return a zero vector of dimension n
+func ZeroV(n int) Vector {
+	v := make(Vector, n)
+	for i := 0; i < n; i++ {
+		v[i] = 0
+	}
+	return v
+
+}
+
+// Test if the two vectors are equal
+func (v1 Vector) Eq(v2 Vector) bool {
+	if len(v1) != len(v2) {
+		return false
+	}
+	for i, x := range v1 {
+		if x != v2[i] {
+			return false
+		}
+	}
+	return true
+}
+
 // Scalar multiplication of a vector
 func (v Vector) Mul(a float64) Vector {
 	v2 := make(Vector, 0, len(v))
