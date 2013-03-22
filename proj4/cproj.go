@@ -1,4 +1,4 @@
-package cproj
+package proj4
 
 import (
 	"bytes"

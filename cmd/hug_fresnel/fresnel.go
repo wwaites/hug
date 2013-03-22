@@ -1,15 +1,15 @@
 package main
 
 import (
-	"cproj"
 	"flag"
 	"fmt"
-	"fresnel"
-	"geo"
 	"log"
 	"math"
 	"os"
-	"vect"
+	"gallows.inf.ed.ac.uk/hug/alg"
+	"gallows.inf.ed.ac.uk/hug/radio"
+	"gallows.inf.ed.ac.uk/hug/geo"
+	"gallows.inf.ed.ac.uk/hug/proj4"
 )
 
 var s, srid int
@@ -37,7 +37,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p1, err := vect.ParseCoord(flag.Arg(0))
+	p1, err := alg.ParseCoord(flag.Arg(0))
 	if err != nil || len(p1) < 2 || len(p1) > 3 {
 		if err != nil {
 			log.Print(err)
@@ -46,7 +46,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p2, err := vect.ParseCoord(flag.Arg(1))
+	p2, err := alg.ParseCoord(flag.Arg(1))
 	if err != nil || len(p2) < 2 || len(p2) > 3 {
 		if err != nil {
 			log.Print(err)
@@ -55,27 +55,27 @@ func main() {
 		os.Exit(255)
 	}
 
-	var ll1, ll2 vect.Vector
+	var ll1, ll2 alg.Vector
 	if srid == 4326 {
 		ll1, ll2 = p1, p2
 	} else {
-		proj, err := cproj.InitPlus(fmt.Sprintf("+init=epsg:%d", srid))
+		proj, err := proj4.InitPlus(fmt.Sprintf("+init=epsg:%d", srid))
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer proj.Free()
 
-		wgs84, err := cproj.InitPlus("+init=epsg:4326")
+		wgs84, err := proj4.InitPlus("+init=epsg:4326")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer wgs84.Free()
 
-		ll1, err = cproj.Transform(proj, wgs84, p1)
+		ll1, err = proj4.Transform(proj, wgs84, p1)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ll2, err = cproj.Transform(proj, wgs84, p2)
+		ll2, err = proj4.Transform(proj, wgs84, p2)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -103,7 +103,7 @@ func main() {
 	theta := math.Acos(costheta)
 //	slope := math.Tan(theta)
 
-	R := vect.Matrix{
+	R := alg.Matrix{
 		{ math.Cos(theta), -1 * math.Sin(theta) },
 		{ math.Sin(theta), math.Cos(theta) },
 	}
@@ -119,15 +119,15 @@ func main() {
 		// elevation of the link itself
 		//le := v[0] * slope + h1
 		// and rotate the point itself
-		x0 := vect.Matrix{
+		x0 := alg.Matrix{
 			{ v[0] },
 			{ h1 },
 		}
-		x1 := vect.Matrix {
+		x1 := alg.Matrix {
 			{ v[0] },
 			{ h1 - 1 * v[1] },
 		}
-		x2 := vect.Matrix {
+		x2 := alg.Matrix {
 			{ v[0] },
 			{ h1 + v[1] },
 		}

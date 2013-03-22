@@ -1,17 +1,17 @@
-package tgutil
+package misc
 
 import (
 	"bufio"
 	"bytes"
 	"os"
 	"strconv"
-	"vect"
+	"gallows.inf.ed.ac.uk/hug/alg"
 )
 
 // given a file with floating point numbers, space separated, several
 // per line, return each line, parsed, into a channel
-func Numbers(f *os.File) (ch chan vect.Vector) {
-	ch = make(chan vect.Vector)
+func Numbers(f *os.File) (ch chan alg.Vector) {
+	ch = make(chan alg.Vector)
 	go func() {
 		b := bufio.NewReader(f)
 		for { 
@@ -21,7 +21,7 @@ func Numbers(f *os.File) (ch chan vect.Vector) {
 			}
 
 			sp := bytes.Split(line, []byte(" "))
-			v := make(vect.Vector, 0, len(sp))
+			v := make(alg.Vector, 0, len(sp))
 			for _, s := range sp {
 				x, err := strconv.ParseFloat(string(s), 64)
 				if err != nil {

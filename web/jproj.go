@@ -1,18 +1,17 @@
-package jproj
+package web
 
 import (
-	"cproj"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
-	"webx"
+	"gallows.inf.ed.ac.uk/hug/proj4"
 )
 
 type xformReq struct {
-	from_pj, to_pj *cproj.Proj
+	from_pj, to_pj *proj4.Proj
 	coords []float64
 }
 
@@ -57,7 +56,7 @@ func parseForm(req *http.Request) (xfr *xformReq, err error) {
 	from_epsg := bytes.NewBufferString("+init=epsg:")
 	from_epsg.WriteString(from_srid)
 
-	xr.from_pj, e = cproj.InitPlus(from_epsg.String())
+	xr.from_pj, e = proj4.InitPlus(from_epsg.String())
 	if e != nil {
 		err = e
 		return
@@ -66,7 +65,7 @@ func parseForm(req *http.Request) (xfr *xformReq, err error) {
 	to_srid := req.FormValue("to_srid")
 	to_epsg := bytes.NewBufferString("+init=epsg:")
 	to_epsg.WriteString(to_srid)
-	xr.to_pj, e = cproj.InitPlus(to_epsg.String())
+	xr.to_pj, e = proj4.InitPlus(to_epsg.String())
 	if e != nil {
 		err = e
 		xr.from_pj.Free()
@@ -137,7 +136,7 @@ func parseBody(req *http.Request) (xfr *xformReq, err error) {
 	}
 	from_epsg := fmt.Sprintf("+init=epsg:%d", int(from_srid))
 
-	xr.from_pj, e = cproj.InitPlus(from_epsg)
+	xr.from_pj, e = proj4.InitPlus(from_epsg)
 	if e != nil {
 		err = e
 		return
@@ -156,7 +155,7 @@ func parseBody(req *http.Request) (xfr *xformReq, err error) {
 		return
 	}
 	to_epsg := fmt.Sprintf("+init=epsg:%d", int(to_srid))
-	xr.to_pj, e = cproj.InitPlus(to_epsg)
+	xr.to_pj, e = proj4.InitPlus(to_epsg)
 	if e != nil {
 		err = e
 		xr.from_pj.Free()
@@ -179,14 +178,14 @@ func JsonProj(w http.ResponseWriter, req *http.Request) {
 		xr, err = parseForm(req)
 	}
 	if err != nil {
-		webx.JsonError(w, err.Error(), http.StatusBadRequest)
+		JsonError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer xr.Free()
 
-	result, err := cproj.Transform(xr.from_pj, xr.to_pj, xr.coords)
+	result, err := proj4.Transform(xr.from_pj, xr.to_pj, xr.coords)
 	if err != nil {
-		webx.JsonError(w, err.Error(), http.StatusInternalServerError)
+		JsonError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -197,5 +196,5 @@ func JsonProj(w http.ResponseWriter, req *http.Request) {
 		r["z"] = result[2]
 	}
 
-	webx.JsonResponse(w, r)
+	JsonResponse(w, r)
 }

@@ -2,8 +2,8 @@ package geo
 
 import (
 	"fmt"
-	"hugs.alg"
 	"math"
+	"gallows.inf.ed.ac.uk/hug/alg"
 )
 
 // Radius of the earth in meters
@@ -69,7 +69,7 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan alg.Vector) {
 // Given two points, as with ChordHeight, and a sequence of data points representing 
 // the terrain height between those two points, adjust the data to correct for the curvature
 // of the earth.
-func AdjustAlt(p1, p2 LonLat, pts chan alg.Vector, r float64) (ch chan Vector) {
+func AdjustAlt(p1, p2 LonLat, pts chan alg.Vector, r float64) (ch chan alg.Vector) {
 	ch = make(chan alg.Vector)
 
 	go func () {

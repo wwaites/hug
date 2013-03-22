@@ -1,13 +1,13 @@
 package main
 
 import (
-	"cproj"
 	"flag"
 	"fmt"
-	"geo"
 	"log"
 	"os"
-	"vect"
+	"gallows.inf.ed.ac.uk/hug/proj4"
+	"gallows.inf.ed.ac.uk/hug/geo"
+	"gallows.inf.ed.ac.uk/hug/alg"
 )
 
 var s, srid int
@@ -34,7 +34,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p1, err := vect.ParseCoord(flag.Arg(0))
+	p1, err := alg.ParseCoord(flag.Arg(0))
 	if err != nil || len(p1) < 2 {
 		if err != nil {
 			log.Print(err)
@@ -43,7 +43,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p2, err := vect.ParseCoord(flag.Arg(1))
+	p2, err := alg.ParseCoord(flag.Arg(1))
 	if err != nil || len(p2) < 2 {
 		if err != nil {
 			log.Print(err)
@@ -56,23 +56,23 @@ func main() {
 	if srid == 4326 {
 		ll1, ll2 = geo.LonLat(p1), geo.LonLat(p2)
 	} else {
-		proj, err := cproj.InitPlus(fmt.Sprintf("+init=epsg:%d", srid))
+		proj, err := proj4.InitPlus(fmt.Sprintf("+init=epsg:%d", srid))
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer proj.Free()
 
-		wgs84, err := cproj.InitPlus("+init=epsg:4326")
+		wgs84, err := proj4.InitPlus("+init=epsg:4326")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer wgs84.Free()
 
-		ll1, err = cproj.Transform(proj, wgs84, p1)
+		ll1, err = proj4.Transform(proj, wgs84, p1)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ll2, err = cproj.Transform(proj, wgs84, p2)
+		ll2, err = proj4.Transform(proj, wgs84, p2)
 		if err != nil {
 			log.Fatal(err)
 		}

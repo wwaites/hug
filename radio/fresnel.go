@@ -2,7 +2,7 @@ package fresnel
 
 import (
 	"math"
-	"hug.alg"
+	"gallows.inf.ed.ac.uk/hug/alg"
 )
 
 const C = 299792458.0

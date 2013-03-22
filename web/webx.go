@@ -1,4 +1,4 @@
-package webx
+package web
 
 import (
 	"encoding/json"

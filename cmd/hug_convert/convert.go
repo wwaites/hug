@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"cproj"
 	"log"
 	"os"
 	"strings"
-	"vect"
+	"gallows.inf.ed.ac.uk/hug/alg"
+	"gallows.inf.ed.ac.uk/hug/proj4"
 )
 
 var src_srid int
@@ -29,12 +29,12 @@ func main() {
 	log.SetFlags(0)
 	log.SetOutput(os.Stderr)
 
-	sproj, err := cproj.InitPlus(fmt.Sprintf("+init=epsg:%d", src_srid))
+	sproj, err := proj4.InitPlus(fmt.Sprintf("+init=epsg:%d", src_srid))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sproj.Free()
-	dproj, err := cproj.InitPlus(fmt.Sprintf("+init=epsg:%d", dst_srid))
+	dproj, err := proj4.InitPlus(fmt.Sprintf("+init=epsg:%d", dst_srid))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	coord, err := vect.ParseCoord(flag.Arg(0))
+	coord, err := alg.ParseCoord(flag.Arg(0))
 	if err != nil || len(coord) < 2 || len(coord) > 3 {
 		if err != nil {
 			log.Print(err)
@@ -55,7 +55,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	result, err := cproj.Transform(sproj, dproj, coord)
+	result, err := proj4.Transform(sproj, dproj, coord)
 	if err != nil {
 		log.Fatal(err)
 	}
