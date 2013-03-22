@@ -7,9 +7,10 @@ import (
 	"math"
 	"os"
 	"gallows.inf.ed.ac.uk/hug/alg"
-	"gallows.inf.ed.ac.uk/hug/radio"
 	"gallows.inf.ed.ac.uk/hug/geo"
+	"gallows.inf.ed.ac.uk/hug/misc"
 	"gallows.inf.ed.ac.uk/hug/proj4"
+	"gallows.inf.ed.ac.uk/hug/radio"
 )
 
 var s, srid int
@@ -37,7 +38,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p1, err := alg.ParseCoord(flag.Arg(0))
+	p1, err := misc.ParseCoord(flag.Arg(0))
 	if err != nil || len(p1) < 2 || len(p1) > 3 {
 		if err != nil {
 			log.Print(err)
@@ -46,7 +47,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	p2, err := alg.ParseCoord(flag.Arg(1))
+	p2, err := misc.ParseCoord(flag.Arg(1))
 	if err != nil || len(p2) < 2 || len(p2) > 3 {
 		if err != nil {
 			log.Print(err)

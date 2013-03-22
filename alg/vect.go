@@ -3,7 +3,6 @@ package alg
 import (
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -95,20 +94,6 @@ func (v Vector) String() string {
 		s = append(s, fmt.Sprintf("%.06f", v))
 	}
 	return "[" + strings.Join(s, ", ") + "]"
-}
-
-func ParseCoord(coord string) (v Vector, err error) {
-	xs := strings.Split(coord, ",")
-	v = make(Vector, 0, len(xs))
-	for _, s := range xs {
-		x, e := strconv.ParseFloat(s, 64)
-		if e != nil {
-			err = e
-			break
-		}
-		v = append(v, x)
-	}
-	return
 }
 
 type Matrix []Vector

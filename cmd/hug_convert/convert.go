@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
-	"gallows.inf.ed.ac.uk/hug/alg"
+	"gallows.inf.ed.ac.uk/hug/misc"
 	"gallows.inf.ed.ac.uk/hug/proj4"
 )
 
@@ -46,7 +46,7 @@ func main() {
 		os.Exit(255)
 	}
 
-	coord, err := alg.ParseCoord(flag.Arg(0))
+	coord, err := misc.ParseCoord(flag.Arg(0))
 	if err != nil || len(coord) < 2 || len(coord) > 3 {
 		if err != nil {
 			log.Print(err)
