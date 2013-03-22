@@ -8,6 +8,3 @@ build:
 
 install:
 	go install -compiler=${GCCGO} -gccgoflags="${GCCGOFLAGS}" gallows.inf.ed.ac.uk/hug/...
-
-clean:
-	go clean -x gallows.inf.ed.ac.uk/hug/...
