@@ -2,14 +2,14 @@ package geo
 
 import (
 	"fmt"
+	"hugs.alg"
 	"math"
-	"vect"
 )
 
 // Radius of the earth in meters
 const R = 6378100.0
 
-type LonLat vect.Vector
+type LonLat alg.Vector
 func (l LonLat)Lon() float64 {
 	return l[0]
 }
@@ -23,8 +23,8 @@ func (l LonLat)String() string {
 // Transform from spherical coordinates in the geographic convention
 // to cartesian coordinates with the x axis pointing towards the prime
 // meridian and the z axis pointing to the north pole
-func Cartesian(p LonLat, r float64) vect.Vector {
-	x := make(vect.Vector, 3)
+func Cartesian(p LonLat, r float64) alg.Vector {
+	x := make(alg.Vector, 3)
 	// convert to radians
 	lon := p.Lon() * math.Pi / 180
 	lat := p.Lat() * math.Pi / 180
@@ -44,7 +44,7 @@ func Cartesian(p LonLat, r float64) vect.Vector {
 // The return value is a list of (d,h) pairs where d is the distance along the chord starting
 // at p1 and h is the difference between r and the distance from the centre of the sphere
 // to that point.
-func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
+func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan alg.Vector) {
 	// transform to cartesian coordinates
 	x1 := Cartesian(p1, r)
 	x2 := Cartesian(p2, r)
@@ -55,10 +55,10 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
 	stepsize := step.Length()
 
 	// implementation detail -- this is just AdjustAlt with altitude set to zero!
-	pts := make(chan vect.Vector)
+	pts := make(chan alg.Vector)
 	go func() {
 		for i := 0 ; i <= n; i++ {
-			pts <- vect.Vector{float64(i) * stepsize, 0}
+			pts <- alg.Vector{float64(i) * stepsize, 0}
 		}
 		close(pts)
 	}()
@@ -69,8 +69,8 @@ func ChordHeight(p1, p2 LonLat, r float64, n int) (ch chan vect.Vector) {
 // Given two points, as with ChordHeight, and a sequence of data points representing 
 // the terrain height between those two points, adjust the data to correct for the curvature
 // of the earth.
-func AdjustAlt(p1, p2 LonLat, pts chan vect.Vector, r float64) (ch chan vect.Vector) {
-	ch = make(chan vect.Vector)
+func AdjustAlt(p1, p2 LonLat, pts chan alg.Vector, r float64) (ch chan Vector) {
+	ch = make(chan alg.Vector)
 
 	go func () {
 		// transform to cartesian coordinates
@@ -85,7 +85,7 @@ func AdjustAlt(p1, p2 LonLat, pts chan vect.Vector, r float64) (ch chan vect.Vec
 		for pt := range pts {
 			x := x1.Add(ud.Mul(pt[0]))
 			h := x.Norm().Mul(pt[1] + r)
-			v := vect.Vector{
+			v := alg.Vector{
 				// component in the direction of the line
 				h.Dot(ud) - x1.Dot(ud),
 				// component perpendicular to the line
