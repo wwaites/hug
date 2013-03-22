@@ -5,7 +5,7 @@ GOROOT      ?=/usr/lib/go
 all: build
 
 build:
-	@go build -x -v -compiler=${GCCGO} -gccgoflags="${GCCGOFLAGS}" gallows.inf.ed.ac.uk/hug/...
+	@go build -v -compiler=${GCCGO} -gccgoflags="${GCCGOFLAGS}" gallows.inf.ed.ac.uk/hug/...
 
 install:
 	mkdir -p ${GOROOT}/pkg/gccgo
